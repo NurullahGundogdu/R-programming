@@ -1,0 +1,103 @@
+---
+title: "Liste islemleri"
+output: html_document
+---
+
+
+
+
+## Liste Isimlendirme
+
+
+
+```{r }
+
+
+liste <- list(c("ali", "ata", "bak"),
+              matrix(1:9, 3, 3),
+              list("hebe", 1:10))
+
+names(liste) <- c("1", "2", "3")
+
+
+```
+
+
+## Liste Eleman islemleri
+
+
+
+```{r }
+
+liste[1]   #diger dillerde oldugu gibi index ile erisim
+ 
+liste$`1` # $ isreti ile erişim
+
+
+liste[4] <- "eleman"    # eleman eklenir
+
+
+liste[4] <- NULL  #eleman silinir
+
+```
+
+
+## List to vector
+
+
+
+```{r }
+
+list1 <- list(1:15)
+
+
+vec <- unlist(list1)   #vectore donusturur
+
+is.vector(vec)
+
+
+```
+
+
+
+
+## Liste uzerinde apply uygulamalari
+
+
+
+```{r include=FALSE}
+
+l <- list(bir = 1:10, karesel = (1:10)^2, kup = (1:10)^3)
+
+
+lapply(l, mean)
+
+lapply(l, sum)    
+
+
+lapply(l, function(x) x^4)  #apply fonksiyounun icine kendi fonksiyonlarimizida yazabiliriz
+
+lapply(c(1,2,3), function(x) matrix(rnorm(9), 3, 3))
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

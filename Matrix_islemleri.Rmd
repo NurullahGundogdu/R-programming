@@ -1,0 +1,225 @@
+---
+title: "Matrislerle basit islemler"
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+editor_options:
+  chunk_output_type: console
+---
+
+## Vectorlerden Matris Olusturma
+
+```{r}
+
+#Farklı yontemlerle matrix olusturma
+
+v1 <- c(3,4,6,8,5)
+v2 <- c(4,8,4,7,1)
+v3 <- c(2,2,5,4,6)
+v4 <- c(4,7,5,2,5)
+
+cbind(v1,v2,v3,v4)
+
+matrix(1:9, nrow = 3, ncol = 3)
+
+matrix(1:9, nrow = 3, ncol = 3, byrow = TRUE)
+
+matrix(c(1,2,3,11,22,33), nrow = 2, ncol = 3)
+
+matrix(c(1,2,3,11,22,33,111,222,333), 3, 3)
+
+
+
+```
+
+
+
+## Matris Boyutları ve Frekans Tablosu
+
+```{r}
+
+m <- matrix(c(1,2,3,11,22,33,111,222,333), 3, 3)
+
+dim(m)
+
+m <- matrix(rep(3:5, 3), 3, 3)
+
+table(m)
+
+
+```
+
+
+
+## Matris Eleman Secimi
+
+```{r}
+
+MA <- rnorm(16)
+
+MA <- matrix(MA, 4, 4)
+
+MB <- rnorm(16,90,10)
+
+MB <- matrix(MB, 4, 4)
+
+cbind(MA,MB)
+
+
+
+
+cbind(MA[1:2,1:2],MB[3:4,3:4])
+
+
+```
+
+
+## Matris Isimlendirme
+
+
+```{r}
+
+v1 <- c(3,4,6,8,5)
+v2 <- c(4,8,4,7,1)
+v3 <- c(2,2,5,4,6)
+v4 <- c(4,7,5,2,5)
+
+v <- cbind(v1,v2,v3,v4)
+
+colnames(v) <- c("bir", "iki", "uc", "dort")
+
+rownames(v) <- c("bir", "iki", "uc", "dort", "bes")
+
+
+m <- matrix(1:10000, ncol = 5, nrow = 500)
+
+
+
+rownames(m) <- c(paste("person", 1:500, sep = "_" ))
+
+
+
+m2 <- matrix(1:1000, 20, 10)
+
+
+# her kolona kolonun ortalamasını isim olarak atama
+
+colnames(m2) <- as.character(round(sqrt(apply(m2, 2, mean))))
+
+
+```
+
+
+## Lineer Cebir İslemleri
+
+```{r}
+
+
+A <- matrix(1:9, 3, 3)
+
+diag(A)  # kosegen elemanlari
+
+
+t(A)  #transpozu
+
+det(matrix(c(0,1,1,1), nrow = 2))  #determinant
+
+
+
+A %*% A  #matris carpimi
+
+A * A #skaler caprim
+
+
+solve(matrix(c(3,4,5,8), 2, 2)) #tersini alma
+
+
+```
+
+
+
+
+
+## Matris Formunda regresyon
+
+
+```{r}
+
+
+library(readr)
+
+hsb <- read_table2("hsb.txt")
+
+hsb <- na.omit(hsb)  #eksik ozlem gordugunde satiri siler
+
+
+y <- matrix(hsb$write, ncol = 1)
+
+y
+
+
+#  $ isareti icindeki degiskenlere erisimi saglar
+
+
+x <- as.matrix(cbind(hsb$math, hsb$science, hsb$socst, hsb$female))
+
+
+
+n <- nrow(x)  #row sayisi
+
+p <- ncol(x)  # col sayisi
+
+    
+solve(t(x) %*% x ) %*% t(x) %*% y
+
+
+
+# r kendi regresyon islemi
+
+summary(lm(write ~ math + science + socst + female, hsb))
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

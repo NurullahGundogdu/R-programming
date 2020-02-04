@@ -1,0 +1,153 @@
+---
+title: "Karakter islemleri"
+output: html_document
+---
+
+## Temel islemler
+
+
+```{r }
+
+#   karakter olusturma yontemleri
+
+library(stringr)
+
+k <- ""
+
+k1 <- character(0)
+
+k
+
+k1
+
+
+k <- "1"
+k1 <- "2"
+
+paste(k, k1)
+
+paste(k, k1, sep = "," )
+
+print("karakter")
+
+# quote ve noquote tirnaklari siler
+
+print("karakter", quote = FALSE)
+
+noquote("karakter")
+
+cat("karakter")
+
+
+toString(c("sksk", 2, 6))
+
+# nchar boyutu dondurur
+
+nchar("ksksksk sllsls lslls")
+
+#vectorun boyutunu verir
+
+length(c("jjj",3,5))
+
+# belirtilen karakteri belirtilen karakter ile degistirir
+
+chartr("e", "S", "el ele el ele")
+
+# kendince elemanlari kisaltir
+
+renkeler <- colors()[1:6]
+
+abbreviate(renkeler, minlength = 3)
+
+#belirlenen sub stringi dondurur
+
+substr("nurullah", 2, 5)
+
+# grep belirlenen stringin vector icindeki yerleri dondurur
+
+v <- c("ali", "mehmet", "veli", "ırmak", "ismailali", "ali")
+
+grep("ali",v)
+
+# sub belirlenen stringi baska string ile degistirme
+
+v <- c("ali", "mehmet", "veli", "ırmak", "ismailali", "ali")
+
+sub("ali", "ile", v)
+
+```
+
+
+## vectorel islemler
+
+```{r}
+
+a <- c("R", "sql", "Python","SPSS", "SAS") 
+
+b <- c( "sql","R", "Python","SPSS", "Excel")
+
+c <- c("R", "sql", "Python", "SAS","SPSS") 
+
+
+#union birlestirir
+
+union(a,b)
+
+#kesisim
+
+intersect(a,b)
+
+
+# ikisinin kesisiminde olmayanlari alir
+
+setdiff(a,b)
+
+#esit mi kontrolu
+
+setequal(a,b)
+
+setequal(a,c)
+
+
+#identical sıralarıyla esit olmali
+
+identical(a,b)
+
+identical(a,a)
+
+```
+
+
+## String islemleri
+
+```{r}
+
+v <- c("ali", "mehmet", "veli", "ırmak", "ismailaliali", "ali")
+
+#eslesme saptar
+
+str_detect(v, "ali")
+
+# eslesme indeksleri
+
+str_which(v, "ali")
+
+# her elemanda kaç eslesme var
+
+str_count(v, "ali")
+
+#bulundugu konumu gosterir
+
+str_locate(v, "ali")
+
+str_locate_all(v, "ali")
+
+str_sub(v, 1, 3)
+
+str_replace(v, "ali", "..")
+
+str_replace_all(v, "ali", "..")
+
+```
+
+
