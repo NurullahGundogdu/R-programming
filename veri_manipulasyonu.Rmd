@@ -1,0 +1,238 @@
+---
+title: "Veri Manipulasyonu"
+output: html_document
+editor_options : 
+  chunk_output_type : console
+---
+
+mcyflights 2013 yili New york ucus bilgileri
+
+http://www.transtats.bts.gov/DatabaseInfo.asp?DB_ID=120&Link=0
+
+```{r}
+
+library(dplyr)
+library(nycflights13)
+
+df <- flights
+
+df
+
+str(df)
+
+summary(df)
+
+# select fonksiyonu df icindeki belirtilen degiskenleri secerek bir tablo olusturur
+# filter fonksiyonu belirtilen degiskenin belitilen kosuldaki degiskenlerini secer
+# group_by donksiyonu belirlenen degiskene gore tabloyu gruplaa ayirir
+# summarise ortalama bir deger yapar
+
+
+df %>% 
+  select(dep_delay, day, carrier) %>% 
+  filter(dep_delay > 10) %>%
+  group_by(carrier) %>%
+  summarise(n = n(), 
+            ortalama = mean(dep_delay))
+
+```
+
+
+## degisken islemleri :  select()
+```{r}
+
+select(df, carrier, flight, tailnum)  # belirtilenleri secme
+
+select(df, carrier, origin:hour)  # aralık vererek secme
+
+select(df, 1:4)  # aralık vererek secme
+
+select(df, -c(carrier, origin))  # belirtilenleri disarda birakir
+
+
+select(df, contains("time"))  # belirtilen degiskeni iceren elemanların tablosu
+
+select(df, starts_with("dep"))  #  belirtilen degiske ile baslayan elemanların tablosu
+
+select(df, ends_with("delay"))  #  belirtilen degiske ile biten elemanların tablosu
+
+m <- matrix(1:25, 5, 5 )
+
+colnames(m) <- paste("x", 1:5, sep = "")
+
+select(as.data.frame(m), num_range("x", 1:3)) # belirtilen data frame icinde x in yanında farkli degerler olunca ise yarar
+
+
+select(df, carrier, tailnum, contains("time"))  #farkli kullnaimlari da mevcuttur
+
+```
+
+
+## Gozlem islemleri :  filter()
+```{r}
+
+filter(df, year == 2013 & month == 2) # belitilen durumlara gore filtreleyipo bize verir
+
+filter(df, dep_delay > mean(df$dep_delay, na.rm = TRUE) + sd(df$dep_delay, na.rm = TRUE))  # gecikmesi ortlama gecikmeden kucuk olanlar ve standartdan sapmasından
+
+
+
+df %>%
+  filter(month == 2, day == 18) %>%
+  select(dep_delay, month) %>%
+  arrange(desc(dep_delay), month)  # belirtilen degiskenlere gore siralar
+  
+df %>% sample_frac(0.05) #belirli bir oranda rastgele secim yapiyor
+
+
+df %>% sample_n(20) #belirli bir degerde rastgele secim yapiyor
+
+df %>% slice(1:20)  #pozisyona gore secim yapiyor
+
+df %>% top_n(10)  #ilk n degiskeni secer
+
+```
+
+## Degisken donusum islemleri :  mutate()
+```{r}
+
+sample <- df %>% 
+  sample_n(20) %>%
+  select(arr_delay, dep_delay, distance, arr_time)
+
+sample
+
+m <- mutate(sample, 
+       kazanc = arr_delay - dep_delay, 
+       hiz = distance / arr_time * 60,
+       yeni = kazanc / hiz) #yeni degisken olusturulur
+
+
+rename(m,
+       kaz = kazanc,
+       h = hiz)  # isimmlendirme yapar
+
+
+transmute(sample, 
+       kazanc = arr_delay - dep_delay, 
+       hiz = distance / arr_time * 60,
+       yeni = kazanc / hiz) # yeni degisken olusturdaktan sonra eskileri istemezsek bu fonksiyon bunu saglar
+
+```
+
+## Gruplama ve veri ozetleme:  group_by()
+```{r}
+# group_by fonksiyonu belirlenen deiskene gore gruplar
+
+df %>% sample_n(20) %>% 
+  group_by(carrier) %>%
+  summarise(sayi = n(),
+            ortalama = mean(dep_delay, na.rm = TRUE),
+            medyan = median(dep_delay, na.rm = TRUE),
+            sd = sd(dep_delay, na.rm = TRUE))
+
+
+```
+
+
+## Tidy data gathering ve spreading :  select()
+```{r}
+
+library(tidyverse)
+
+# kutuphanenin icindeki tablolar
+
+#tablolarda belirli bozukluklar var bunlar düzeltilecek 
+
+table1
+
+table2
+
+table3
+
+table4a
+
+table4b
+
+
+```
+
+
+
+```{r}
+
+# gather fonksiyonu getirmek istedigimiz degiskenleri tek bir satira toplar
+
+# bozuk yapidaki tablonun 1999 ve 2000 adli stunlarini year stunu altina toplayip degerlerini de cases stuunu altina topladik
+
+tidya <- table4a %>% gather('1999', '2000', key = "year", value = "cases")  
+
+tidya
+
+# ayni durumdaki table4b de duzenlendi
+
+tidyb <- table4b %>% gather('1999', '2000', key = "year", value = "population") 
+
+tidyb
+
+# bu iki tabloyu tek bir tab lo olarak olusturucaz
+
+left_join(tidya, tidyb)
+
+
+```
+
+
+
+```{r}
+
+#spreaing fonksiyonu gather fonksiyonun tersidir
+
+table2 
+
+# table2 deki cases sutunun altindaki cases ve population degiskenlerinden yeni suunlar olusturup altlarina da count degerlerini yaziyoruz
+spread(table2, key = "type", value = "count")
+
+
+```
+
+
+
+
+```{r}
+
+#separeting fonksiyonu bir degiskenin degerini iki degiskenin degeri olarak donusturur
+
+table3 
+
+# table3 de rate degikenin altindaki degerleri cases ve poopulation adli iki ayri degiskene bolucez
+
+table3 %>% separate(rate, into = c("cases", "population"), sep = "/", convert = TRUE)
+
+```
+
+
+```{r}
+
+#unite fonksiyonu separeting fonksiyonun tersidir bu da iki degiskeni tek degisken altinda toplar
+
+table5 
+
+# table5 deki century ve year degsikenlerini tek degisken olarak yazdik
+
+table5 %>% unite(new, century, year, sep = "")
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
