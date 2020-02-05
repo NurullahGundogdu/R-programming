@@ -1,0 +1,444 @@
+---
+title: "Veri Gorselleştirme"
+output: html_document
+---
+
+```{r}
+
+library(tibble)
+library(dplyr)
+library(ggplot2)
+
+
+```
+
+
+# 1.Tek Degiskenli Gorsellestirme
+
+## 1.1. Kesikli degisken
+
+Eger kesiklibir degisken gorsellestirelecek is iki turlu yapilabilir. Brincisi frekansa gore ikincisi mutlak degerine gore.
+
+```{r}
+
+
+
+df <- tibble(
+  kullanim = c(rep("hi", 20), rep("hs", 10)))
+
+
+df2 <- tibble(
+  kullanim = factor(c("hi", "hs"),    
+  levels = c("hi","hs")),
+  sure = c(100, 180))
+
+```
+
+### 1.1.1. Sutun grafigi
+
+```{r}
+
+# aes fonksiyonu estetik ozelliklerini belirtir
+
+
+# sutun grafigi frekansa gore
+
+ggplot(df, aes(x = kullanim)) +
+  geom_bar()
+
+# sutun grafigi mutlak degere gore
+
+ggplot(df2, aes(x = kullanim, y = sure)) +
+  geom_bar(stat = "identity")
+
+
+
+```
+
+### 1.1.2. Cizgi grafigi
+
+```{r}
+
+# cizgi grafik
+
+ggplot(df2, aes(x = kullanim, y = sure, group = 1)) +
+  geom_line()
+
+# nokta grafik
+ggplot(df2, aes(x = kullanim, y = sure, group = 1)) +
+  geom_point()
+
+# nokta ve cizgi bir arada grafik
+ggplot(df2, aes(x = kullanim, y = sure, group = 1)) +
+  geom_line() + geom_point()
+
+
+# nokta ve cizgi bir arada grafik geometrik sekilleri ozellestirilmis sekilde ve y argumani 0  dan baslamaktadir
+ggplot(df2, aes(x = kullanim, y = sure, group = 1)) +
+  geom_line(colour = "red", linetype = "dashed", size = 1.6) + 
+  geom_point(colour = "red", size = 4, shape = 21, fill = "white" ) + expand_limits(y = 0)
+
+```
+
+
+
+## 1.2. Surekli Degisken
+
+```{r}
+
+df <- tibble(
+  cinsiyet = factor(rep(c("E", "K"), each = 500)),
+  sure = c(rnorm(500, mean = 80), rnorm(500, mean = 81)))
+
+
+```
+
+### 1.2.1. Histogram (geom_histogram)
+
+```{r}
+
+#histogram olusturmak icin 2 parametre gereklidir. Biri grup sayisi digeri grup aralıgı.
+
+ggplot(df, aes(sure)) + 
+  geom_histogram()
+
+
+ggplot(df, aes(sure)) + 
+  geom_histogram(binwidth = .5, colour = "black", fill = "orange") +
+  xlab("Sure dagilimi") + ylab("frekans") + ggtitle("Histogram")
+
+
+# yogunluk grafigi
+
+ggplot(df, aes(sure)) + 
+  geom_density()
+
+
+# yogunluk fonksiyonu ve histogram bir arada
+
+ggplot(df, aes(sure)) + 
+  geom_histogram(aes( y = ..density..), binwidth = .5, colour = "black", fill = "orange"   ) +
+  geom_density(alpha = .3, fill = "black")
+
+
+# Kirilimlara gore Histogram ve Yogunluk Grafigi
+
+ggplot(df, aes(sure, fill = cinsiyet)) + 
+  geom_histogram(binwidth = .5, alpha = .5, position = "identity") 
+
+ggplot(df, aes(sure, fill = cinsiyet)) + 
+  geom_density() 
+
+
+# kirilimlari iki ayri grafikte gostermek icin facet_grid() fonksiyonu kullanilir
+
+ggplot(df, aes(sure)) + 
+  geom_histogram(binwidth = .5, colour = "black", fill = "orange") +
+  facet_grid(cinsiyet ~ .)
+
+```
+
+### 1.2.2 Box Plot (geom_boxplot)
+
+```{r}
+
+# Veri seti icerisindeki aykiri gorselleri gormek icin kullanilir
+
+ggplot(df, aes(x = cinsiyet, y = sure, fill = cinsiyet)) + 
+  geom_boxplot()
+
+# guides fonksiyonu seklin sag tarafindaki sekli kaldirmak icin kullanilir, coord_flip fonksiyonu sekilleri yan cevirir
+
+ggplot(df, aes(x = cinsiyet, y = sure, fill = cinsiyet)) + 
+  geom_boxplot() +
+  guides(fill = FALSE) +
+  coord_flip()
+
+```
+
+
+
+### 1.2.3 Alan Grafik (geom_area)
+
+```{r}
+
+# kendi degerleri uzerindn kapladigi alani gosterir
+
+ggplot(df, aes(sure)) +  
+  geom_area(stat = "bin")
+
+
+```
+
+
+### 1.2.4. Frekans Grafik (geom_freqpoly)
+
+```{r}
+
+ggplot(df, aes(sure)) +  
+  geom_freqpoly()
+
+
+```
+
+### 1.2.5. Dotplot
+
+```{r}
+
+ggplot(df, aes(sure)) +  
+  geom_dotplot()
+
+
+```
+
+
+# 2. Iki degsikeni Gorsellestirme
+
+## 2.1. Surekli X, Sürekli Y
+
+### 2.1.1. Scatter-plot
+
+```{r}
+
+# Scatter plot verilen iki surekli degiskenin birbirlerine gore durumlarini anlamaya yariyor
+
+df <- tibble(
+  cinsiyet = factor(rep(c("E", "K"), each = 500)),
+  m = c(rnorm(500, mean = 80), rnorm(500, mean = 82)),
+  w = c(rnorm(500, mean = 82), rnorm(500, mean = 81)))
+
+df
+
+```
+
+
+
+```{r}
+
+ggplot(df, aes(m, w)) +  
+  geom_point() 
+
+
+ggplot(df, aes(m, w)) +  
+  geom_point() + 
+  geom_smooth(method = lm)
+
+
+ggplot(df, aes(m, w)) +  
+  geom_point() + 
+  geom_smooth(method = lm, se = FALSE)
+
+ggplot(df, aes(m, w)) +  
+  geom_point() + 
+  geom_smooth()
+
+
+ggplot(df, aes(m, w, color = cinsiyet)) +  
+  geom_point() 
+
+ggplot(df, aes(m, w, color = cinsiyet)) +  
+  geom_point() +
+  geom_smooth(method = lm, se = FALSE)
+
+```
+
+## 2.2. Kesikli X, Sürekli Y
+
+### 2.2.1. Sutun Grafigi (geom_bar)
+
+```{r}
+
+df <- tibble(
+  kullanim = factor(c("hi", "hs"), levels = c("hi", "hs")),
+  sure = c(100,180))
+
+
+ggplot(df, aes(kullanim, sure, fill = kullanim)) +
+  geom_bar(colour = "black", fill = "orange", stat = "identity"  )
+
+
+```
+
+
+### 2.2.2. Box Plot
+
+```{r}
+
+df <- tibble(
+  cinsiyet = factor(rep(c("E", "K"), each = 500)),
+  sure = c(rnorm(500, mean = 80), rnorm(500, mean = 81)))
+
+ggplot(df, aes(x = cinsiyet, y = sure, fill = cinsiyet)) + 
+  geom_boxplot() +
+  guides(fill = FALSE) 
+
+```
+
+
+
+### 2.2.3. Dot Plot
+
+```{r}
+
+
+ggplot(df, aes(x = cinsiyet, y = sure, fill = cinsiyet)) +
+  geom_dotplot(binaxis = "y", stackdir = "center")
+
+```
+
+
+
+### 2.2.4. Violin
+
+```{r}
+
+
+ggplot(df, aes(x = cinsiyet, y = sure, fill = cinsiyet)) +
+  geom_violin(scale = "area")
+
+```
+
+
+
+
+
+
+## 2.3. Kesikli X, Kesikli Y
+
+```{r}
+
+df <- tibble(
+  kullanim = factor(c("hi", "hs","hi", "hs"), levels = c("hi", "hs")),
+  sure = c(100,180, 90, 200),
+  cinsiyet = factor(c("E","E","K","K")))
+
+ggplot(df, aes(kullanim, cinsiyet)) +
+  geom_count()
+
+
+```
+
+# 3. Grafik Bolme
+
+```{r}
+
+df <- tibble(
+  c = factor(rep(c("E", "K"), each = 600)),
+  m = c(rnorm(600, mean = 80), rnorm(600, mean = 82)),
+  w = c(rnorm(600, mean = 82), rnorm(600, mean = 81)),
+  me = factor(rep(c("A","B", "C"), each = 400)))
+
+
+t <- ggplot(df, aes(m,w))+ geom_point()
+
+# sutunlara bolme
+t + facet_grid(. ~ c)
+
+# satirlara gore bolme
+t + facet_grid(c ~ .)
+
+# hem satir hem sutunlara bolme
+t + facet_grid(me ~ c)
+
+
+
+```
+
+
+
+# 4. Zaman Serisi Gorselleştirme
+
+```{r}
+
+head(economics)
+
+d <- economics
+
+
+ggplot(d, aes(date, pop)) +
+  geom_line()
+
+# alt kumesini grafikleme
+
+s <- d %>% filter(date > as.Date("2010-1-1"))
+
+ggplot(s, aes(date, pop)) +
+  geom_line()
+
+
+# isiszligin tarihlere gore degisimi
+ggplot(d, aes(date, pop)) +
+  geom_line(aes(size = unemploy/pop))
+
+
+
+```
+
+
+# 5. Coklu Zaman Serisi Gorselleştirme
+
+```{r}
+
+library(tidyr)
+
+df <- economics %>%
+  select(date, psavert, uempmed) %>%
+  gather(key = "variable", value = "value", -date)
+head(df, 3)
+
+ggplot(df, aes(date,value)) + 
+  geom_line(aes(color = variable), size = 1)
+
+
+ggplot(df, aes(date,value)) + 
+  geom_area(aes(color = variable, fill = variable), alpha = 0.5, position = position_dodge(0.8))
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
