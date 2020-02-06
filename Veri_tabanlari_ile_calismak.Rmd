@@ -1,0 +1,123 @@
+---
+title: "Mysql ile çalışma"
+output: html_document
+---
+
+
+# 1. Veri Tabanlari ile Calisma
+
+## 1.1. Veri Tabanina baglama
+
+
+
+```{r }
+
+library(DBI)
+library(dplyr)
+library(dbplyr)
+library(ggplot2)
+
+
+can <- DBI::dbConnect(RMySQL::MySQL(),
+                      host= "localhost",
+                      user = "root",
+                      password = "modernr",
+                      dbname = "test_db"
+                      )
+
+# copy_to fonksiyonu veri ve tablo gondermek icin kullaniliyor
+
+copy_to(con, mpg, "mpg", temporary = FALSE)
+
+
+
+```
+
+
+## 1.2. Sorgu Gondermek
+
+Connection bilgisi uzerinden sql dili ile sorgu gondermek
+
+```{r }
+
+dbGetQuery(con, "select * from mpg limit 10")
+
+```
+
+
+Daha karmasik sql sorgulari gondermek
+
+```{r }
+
+sql <- sprintf("select model, year, cyl from mpg limit 10")
+
+dbGetQuery(con, sql)
+
+
+```
+
+
+## 1.3. dplyr ile Sorgu gondermek
+
+```{r}
+# baglanti dosyasi
+mpg_db <- tbl(con, "mpg")
+
+mpg_db %>% select(model, year)
+
+
+mpg_db %>% group_by(model) %>% summarise(ort = mean(displ))
+
+
+```
+
+
+## 1.4. dplyr dan sql e kod cevirmek
+
+
+
+```{r}
+
+# show_query sql formatina donusturur
+
+mpg_db %>% group_by(model) %>% summarise(ort = mean(displ)) %>% show_query()
+
+
+```
+
+
+# 2. Buyuk veri ile calismak(spark)
+
+Saprk ortamindaki bir veriye erisme islemi yapilmaktadir 
+
+```{r}
+
+
+install.packages("sparklyr")
+
+library(sparklyr)
+library(dplyr)
+
+library(nycflights13)
+
+spark_install()
+
+sc <- spark_connect(master = "local")
+
+
+copy_to(sc, nycflights13::flights, "flights_spark")
+
+src_tbls(sc)
+
+f_tbl <- copy_to(sc, nycflights13::flights, "flights_spark", overwrite = TRUE)
+
+# hava yolu siketlerine gore gecikmelerin ortalamalari alinir
+f_tbl %>% group_by(carrier) %>% summarise(n = n(),
+                                          ort = mean(dep_delay))
+
+
+
+
+
+
+```
